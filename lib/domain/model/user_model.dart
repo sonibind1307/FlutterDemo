@@ -1,7 +1,15 @@
+import 'package:hive/hive.dart';
+
+part 'user_model.g.dart';
+
+@HiveType(typeId: 0)
 class UserModel {
+  @HiveField(0)
   String? login;
   int? id;
+  @HiveField(1)
   String? nodeId;
+  @HiveField(2)
   String? avatarUrl;
   String? gravatarId;
   String? url;
@@ -15,30 +23,31 @@ class UserModel {
   String? reposUrl;
   String? eventsUrl;
   String? receivedEventsUrl;
+  @HiveField(3)
   String? type;
   String? userViewType;
   bool? siteAdmin;
 
   UserModel(
       {this.login,
-        this.id,
-        this.nodeId,
-        this.avatarUrl,
-        this.gravatarId,
-        this.url,
-        this.htmlUrl,
-        this.followersUrl,
-        this.followingUrl,
-        this.gistsUrl,
-        this.starredUrl,
-        this.subscriptionsUrl,
-        this.organizationsUrl,
-        this.reposUrl,
-        this.eventsUrl,
-        this.receivedEventsUrl,
-        this.type,
-        this.userViewType,
-        this.siteAdmin});
+      this.id,
+      this.nodeId,
+      this.avatarUrl,
+      this.gravatarId,
+      this.url,
+      this.htmlUrl,
+      this.followersUrl,
+      this.followingUrl,
+      this.gistsUrl,
+      this.starredUrl,
+      this.subscriptionsUrl,
+      this.organizationsUrl,
+      this.reposUrl,
+      this.eventsUrl,
+      this.receivedEventsUrl,
+      this.type,
+      this.userViewType,
+      this.siteAdmin});
 
   UserModel.fromJson(Map<String, dynamic> json) {
     login = json['login'];

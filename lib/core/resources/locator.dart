@@ -1,12 +1,10 @@
-part of export;
+part of '../export.dart';
 
 final locator = GetIt.instance;
 
 Future<void> initializeDependencies() async {
-  ///dio connection and default duration is 40
-  Dio dio = Dio(BaseOptions(connectTimeout: Duration(seconds: 40)));
-
-  (dio.httpClientAdapter as BrowserHttpClientAdapter).withCredentials = false;
+  ///dio connection and default duration is 30
+  Dio dio = Dio(BaseOptions(connectTimeout: Duration(seconds: 30)));
   locator.registerSingleton<Dio>(dio);
   locator.registerSingleton<RetrofitClient>(RetrofitClient(locator<Dio>()));
   locator.registerSingleton<ApiRepository>(

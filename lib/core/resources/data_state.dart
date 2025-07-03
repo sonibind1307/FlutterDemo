@@ -1,4 +1,4 @@
-part of export;
+part of '../export.dart';
 
 abstract class DataState<T> {
   final T? data;
