@@ -17,7 +17,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<FetchUsers>(_onFetchUsers);
     on<SearchUsers>(_onSearchUser);
     on<LoadUsersFromCache>(_onLoadUsersFromCache);
-
+    on<SwipeToRefresh>(_swipeToRefresh);
     _connectionBloc.stream.listen((state) {
       if (state is ConnectionFailure) {
         _isOnline = false;
@@ -31,8 +31,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         }
       }
     });
-
-    add(LoadUsersFromCache());
   }
 
   Future<void> _onLoadUsersFromCache(
@@ -43,8 +41,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 
   Future<void> _onFetchUsers(FetchUsers event, Emitter<UserState> emit) async {
+    // Exit, don't call API on scroll
     if (!_isOnline) {
-      return; // Exit, don't call API on swipe it will work
+      return;
     }
     if (_isFetching || !_hasMore) return;
 
@@ -132,6 +131,17 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(SuccessUserState(_allUsers));
     } else {
       emit(ErrorUserState(AppConstant.errorNoInternet));
+    }
+  }
+
+  FutureOr<void> _swipeToRefresh(
+      SwipeToRefresh event, Emitter<UserState> emit) {
+    if (_isOnline) {
+      _currentPage = 1;
+      _allUsers.clear();
+      add(FetchUsers());
+    } else {
+      emit(SuccessUserState(_allUsers));
     }
   }
 

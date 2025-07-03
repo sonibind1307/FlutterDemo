@@ -7,6 +7,8 @@ abstract class UserEvent extends Equatable {
 
 class FetchUsers extends UserEvent {}
 
+class SwipeToRefresh extends UserEvent {}
+
 class LoadUsersFromCache extends UserEvent {}
 
 class SearchUsers extends UserEvent {

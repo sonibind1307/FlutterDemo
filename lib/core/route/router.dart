@@ -4,7 +4,7 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(
       path: routeUserList,
-      builder: (context, state) => const UserScreen(),
+      builder: (context, state) =>  UserScreen(),
     ),
     GoRoute(
       path: routeUserDetail,

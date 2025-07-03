@@ -1,7 +1,16 @@
 part of '../../core/export.dart';
 
-class UserScreen extends StatelessWidget {
-  const UserScreen({super.key});
+class UserScreen extends StatefulWidget {
+  UserScreen({super.key});
+
+  @override
+  State<UserScreen> createState() => _UserScreenState();
+}
+
+class _UserScreenState extends State<UserScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +29,13 @@ class UserScreen extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
                 title: TextField(
+              controller: _searchController,
+              focusNode: _searchFocusNode,
               style: TextStyle(fontSize: 16.sp),
               decoration: InputDecoration(
                 hintText: 'Search...',
-                border: InputBorder.none,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.r)),
                 contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
               ),
               onChanged: (query) {
@@ -66,55 +78,66 @@ class UserScreen extends StatelessWidget {
                   );
                 } else if (state is SuccessUserState) {
                   //NotificationListener it detects user is near to bottom that is maxScrollExtent - 200
-                  return NotificationListener<ScrollNotification>(
-                    onNotification: (ScrollNotification scrollInfo) {
-                      if (scrollInfo.metrics.pixels >=
-                          scrollInfo.metrics.maxScrollExtent - 200) {
-                        context.read<UserBloc>().add(FetchUsers());
-                      }
-                      return false;
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      context.read<UserBloc>().add(SwipeToRefresh());
                     },
-                    child: ListView.builder(
-                      /// state.users.length + 1 use for user to show loader
-                      itemCount: state.isLoadingMore
-                          ? state.users.length + 1
-                          : state.users.length,
-
-                      itemBuilder: (context, index) {
-                        if (index < state.users.length) {
-                          UserModel userModel = state.users[index];
-                          return Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 4.h, horizontal: 4.w),
-                            child: ListTile(
-                              onTap: () {
-                                context.push(routeUserDetail, extra: userModel);
-                              },
-                              leading: CircleAvatarWidget(
-                                  imageUrl: userModel.avatarUrl),
-                              title: CustomTextStyle.bold(
-                                text: userModel.login?.toUpperCase() ?? "",
-                                fontSize: 16.sp,
-                              ),
-                              subtitle: CustomTextStyle.regular(
-                                text: userModel.nodeId ?? "",
-                                fontSize: 14.sp,
-                              ),
-                              trailing: CustomTextStyle.regular(
-                                text: userModel.type ?? "",
-                                fontSize: 12.sp,
-                              ),
-                            ),
-                          );
-                        } else {
-                          return Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.h),
-                            child: Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (ScrollNotification scrollInfo) {
+                        if (scrollInfo.metrics.pixels >=
+                            scrollInfo.metrics.maxScrollExtent - 200) {
+                          context.read<UserBloc>().add(FetchUsers());
                         }
+                        return false;
                       },
+                      child: ListView.builder(
+                        /// state.users.length + 1 use for user to show loader
+                        itemCount: state.isLoadingMore
+                            ? state.users.length + 1
+                            : state.users.length,
+
+                        itemBuilder: (context, index) {
+                          if (index < state.users.length) {
+                            UserModel userModel = state.users[index];
+                            return Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 4.h, horizontal: 4.w),
+                              child: ListTile(
+                                onTap: () {
+                                  _searchController.clear();
+                                  context
+                                      .read<UserBloc>()
+                                      .add(SearchUsers(query: ''));
+                                  _searchFocusNode.unfocus();
+                                  context.push(routeUserDetail,
+                                      extra: userModel);
+                                },
+                                leading: CircleAvatarWidget(
+                                    imageUrl: userModel.avatarUrl),
+                                title: CustomTextStyle.bold(
+                                  text: userModel.login?.toUpperCase() ?? "",
+                                  fontSize: 16.sp,
+                                ),
+                                subtitle: CustomTextStyle.regular(
+                                  text: userModel.nodeId ?? "",
+                                  fontSize: 14.sp,
+                                ),
+                                trailing: CustomTextStyle.regular(
+                                  text: userModel.type ?? "",
+                                  fontSize: 12.sp,
+                                ),
+                              ),
+                            );
+                          } else {
+                            return Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.h),
+                              child: Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          }
+                        },
+                      ),
                     ),
                   );
                 } else if (state is ErrorUserState) {
@@ -137,7 +160,7 @@ class UserScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 24.h),
 
-                          CustomTextStyle.bold(
+                          CustomTextStyle.extraBold(
                               fontSize: 24.sp,
                               text: "Ooops!",
                               color: Colors.grey[600]),
@@ -184,5 +207,12 @@ class UserScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+    super.dispose();
   }
 }

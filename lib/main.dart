@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'core/app_color.dart';
 import 'domain/model/user_model.dart';
 
 Future<void> main() async {
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Flutter Demo',
             theme: ThemeData(
+              primaryColor: AppColors.primaryColor,
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
             ),
             routerConfig: appRouter,
